@@ -4,10 +4,9 @@ version = "0.1.0"
 authors = ["laerling <laerling@posteo.de>"]
 edition = "2018"
 
-# the profile used for `cargo build`
-[profile.dev]
-panic = "abort" # disable stack unwinding on panic
+# enables use of `cargo xrun`
+#[target.'cfg(target_os = "none")']
+#runner = "bootimage runner"
 
-# the profile used for `cargo build --release`
-[profile.release]
-panic = "abort" # disable stack unwinding on panic
+[dependencies]
+bootloader = "0.6.0"
