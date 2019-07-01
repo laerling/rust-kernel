@@ -3,7 +3,7 @@ target/x86_64-blog_os/debug/bootimage-blog_os.bin: src/*.rs
 
 PHONY+=run
 run: target/x86_64-blog_os/debug/bootimage-blog_os.bin
-	qemu-system-x86_64 -drive format=raw,file=$+
+	cargo xrun
 
 PHONY+=deps
 deps:
