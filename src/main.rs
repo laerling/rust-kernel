@@ -42,7 +42,7 @@ pub extern "C" fn _start() -> ! {
 
 #[cfg(test)]
 fn test_runner(tests: &[&dyn Fn()]) {
-    serial_println!("Running {} tests", tests.len());
+    serial_println!("Running {} unit tests", tests.len());
     for test in tests {
         test();
     }
