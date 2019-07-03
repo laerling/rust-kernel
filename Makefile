@@ -5,6 +5,10 @@ PHONY+=run
 run: target/x86_64-blog_os/debug/bootimage-blog_os.bin
 	cargo xrun
 
+PHONY+=test
+test: target/x86_64-blog_os/debug/bootimage-blog_os.bin
+	cargo xtest
+
 PHONY+=deps
 deps:
 	# cargo fails if crate already installed, so || true

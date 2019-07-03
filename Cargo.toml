@@ -4,10 +4,6 @@ version = "0.1.0"
 authors = ["laerling <laerling@posteo.de>"]
 edition = "2018"
 
-# enables use of `cargo xrun`
-#[target.'cfg(target_os = "none")']
-#runner = "bootimage runner"
-
 [dependencies]
 bootloader = "0.6.0"
 volatile = "0.2.3"
