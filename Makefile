@@ -1,4 +1,4 @@
-target/x86_64-blog_os/debug/bootimage-blog_os.bin: src/*.rs
+target/x86_64-blog_os/debug/bootimage-blog_os.bin: $(WILDCARD src/*.rs) $(WILDCARD src/**/*.rs)
 	cargo bootimage
 
 PHONY+=run
@@ -12,5 +12,10 @@ deps:
 	cargo install bootimage --version "^0.7.3" || true
 	rustup component add rust-src
 	rustup component add llvm-tools-preview
+
+PHONY+=clean
+clean:
+	find target -name '*blog_os*.bin' -delete
+	find src -name '*~' -delete
 
 .PHONY: $(PHONY)
