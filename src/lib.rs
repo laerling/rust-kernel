@@ -15,6 +15,11 @@ pub mod interrupts;
 
 use core::panic::PanicInfo;
 
+
+pub fn init() {
+    interrupts::init_idt();
+}
+
 pub fn test_runner(tests: &[&dyn Fn()]) {
     serial_println!("Running {} tests", tests.len());
     for test in tests {
@@ -34,6 +39,7 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
 #[cfg(test)]
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
+    init();
     test_main();
     loop {}
 }

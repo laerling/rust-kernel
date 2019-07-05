@@ -12,12 +12,18 @@ use blog_os::println;
 
 #[no_mangle] // don't mangle the name of this function
 pub extern "C" fn _start() -> ! {
-    println!("Hello World!\n\nTodays numbers are {} and {}.", 42, (2.0 / 3.0));
+    println!("Hello World{}", "!");
+
+    blog_os::init();
+
+    // invoke a breakpoint exception
+    x86_64::instructions::interrupts::int3();
 
     #[cfg(test)]
     test_main();
 
-    panic!("Some panic message (called from _start)");
+    println!("It did not crash!");
+    loop {}
 }
 
 /// This function is called on panic.
