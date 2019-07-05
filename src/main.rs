@@ -16,10 +16,11 @@ pub extern "C" fn _start() -> ! {
 
     blog_os::init();
 
-    // trigger a page fault
-    unsafe {
-        *(0xdeadbeef as *mut u64) = 42;
-    };
+    // trigger a stack overflow
+    fn stack_overflow() {
+        stack_overflow();
+    }
+    stack_overflow();
 
     #[cfg(test)]
     test_main();
