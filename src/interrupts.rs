@@ -1,7 +1,6 @@
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 use lazy_static::lazy_static;
-use crate::println;
-use crate::gdt;
+use crate::{println, gdt, print};
 use pic8259_simple::ChainedPics;
 use spin;
 
@@ -23,12 +22,26 @@ lazy_static! {
             idt.double_fault.set_handler_fn(double_fault_handler)
                 .set_stack_index(gdt::DOUBLE_FAULT_IST_INDEX);
         }
+
+        // set timer interrupt handler
+        idt[InterruptIndex::Timer.as_usize()]
+            .set_handler_fn(timer_interrupt_handler);
+
         idt
     };
 }
 
 pub fn init_idt() {
     IDT.load();
+}
+
+extern "x86-interrupt" fn timer_interrupt_handler(
+    _stack_frame: &mut InterruptStackFrame) {
+    print!(".");
+    unsafe {
+        PICS.lock().notify_end_of_interrupt(
+            InterruptIndex::Timer.as_u8());
+    }
 }
 
 extern "x86-interrupt" fn breakpoint_handler(
@@ -39,6 +52,22 @@ extern "x86-interrupt" fn breakpoint_handler(
 extern "x86-interrupt" fn double_fault_handler(
     stack_frame: &mut InterruptStackFrame, _error_code: u64) {
     panic!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
+}
+
+#[derive(Debug, Clone, Copy)]
+#[repr(u8)] // The enum is a C-like enum so that we can directly specify the index for each variant
+pub enum InterruptIndex {
+    Timer = PIC_1_OFFSET,
+}
+
+impl InterruptIndex {
+    fn as_u8(self) -> u8 {
+        self as u8
+    }
+
+    fn as_usize(self) -> usize {
+        usize::from(self.as_u8())
+    }
 }
 
 #[test_case]
