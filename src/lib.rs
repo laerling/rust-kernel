@@ -28,6 +28,7 @@ pub fn init() {
     interrupts::init_idt();
 
     // program Programmable Interval Timer
+    // see https://wiki.osdev.org/Programmable_Interval_Timer
     unsafe {
         let mut port = Port::new(0x40);
         // write twice because I'm not sure if lo, hi, or both
