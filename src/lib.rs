@@ -18,9 +18,18 @@ use core::panic::PanicInfo;
 
 
 pub fn init() {
+
+    // initialize Global Descriptor Table
+    // (sets Code Segment and Task State Segment)
     gdt::init();
+
+    // initialize Interrupt Descriptor Table
     interrupts::init_idt();
+
+    // initialize Programmable Interrupt Controllers
     unsafe { interrupts::PICS.lock().initialize() };
+
+    // enable interrupts
     x86_64::instructions::interrupts::enable();
 }
 
@@ -64,8 +73,6 @@ pub enum QemuExitCode {
 pub fn exit_qemu(exit_code: QemuExitCode) {
     use x86_64::instructions::port::Port;
 
-    unsafe {
-        let mut port = Port::new(0xf4);
-        port.write(exit_code as u32);
-    }
+    let mut port = Port::new(0xf4);
+    unsafe { port.write(exit_code as u32); }
 }
