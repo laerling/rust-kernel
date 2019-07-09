@@ -15,6 +15,7 @@ pub mod interrupts;
 pub mod gdt;
 
 use core::panic::PanicInfo;
+use x86_64::instructions::port::Port;
 
 
 pub fn init() {
@@ -25,6 +26,14 @@ pub fn init() {
 
     // initialize Interrupt Descriptor Table
     interrupts::init_idt();
+
+    // program Programmable Interval Timer
+    unsafe {
+        let mut port = Port::new(0x40);
+        // write twice because I'm not sure if lo, hi, or both
+        port.write(0 as u8);
+        port.write(1 as u8);
+    }
 
     // initialize Programmable Interrupt Controllers
     unsafe { interrupts::PICS.lock().initialize() };
@@ -71,8 +80,6 @@ pub enum QemuExitCode {
 }
 
 pub fn exit_qemu(exit_code: QemuExitCode) {
-    use x86_64::instructions::port::Port;
-
     let mut port = Port::new(0xf4);
     unsafe { port.write(exit_code as u32); }
 }
