@@ -17,11 +17,15 @@ pub static PICS: spin::Mutex<ChainedPics> = spin::Mutex::new(
 lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
-        idt.breakpoint.set_handler_fn(breakpoint_handler);
+
+        // set double fault exception handler
         unsafe {
             idt.double_fault.set_handler_fn(double_fault_handler)
                 .set_stack_index(gdt::DOUBLE_FAULT_IST_INDEX);
         }
+
+        // set breakpoint exception handler
+        idt.breakpoint.set_handler_fn(breakpoint_handler);
 
         // set timer interrupt handler
         idt[InterruptIndex::Timer.as_usize()]
