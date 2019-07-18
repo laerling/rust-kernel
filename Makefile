@@ -22,4 +22,9 @@ clean:
 	find target -name '*blog_os*.bin' -delete
 	find src -name '*~' -delete
 
+# sometimes, cleaning just isn't enough
+PHONY+=purge
+purge: clean
+	rm -rf Cargo.lock target
+
 .PHONY: $(PHONY)
