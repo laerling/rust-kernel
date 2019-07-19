@@ -1,6 +1,8 @@
-use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
+use x86_64::structures::idt::InterruptDescriptorTable;
+use x86_64::structures::idt::InterruptStackFrame;
+use x86_64::structures::idt::PageFaultErrorCode;
 use lazy_static::lazy_static;
-use crate::{println, gdt, print};
+use crate::{println, gdt, print, hlt_loop};
 use pic8259_simple::ChainedPics;
 use spin;
 
@@ -34,6 +36,9 @@ lazy_static! {
         // set keyboard interrupt handler
         idt[InterruptIndex::Keyboard.as_usize()]
             .set_handler_fn(keyboard_interrupt_handler);
+
+        // set page fault handler
+        idt.page_fault.set_handler_fn(page_fault_handler);
 
         idt
     };
@@ -91,6 +96,20 @@ extern "x86-interrupt" fn double_fault_handler(
     stack_frame: &mut InterruptStackFrame, _error_code: u64) {
     panic!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
 }
+
+extern "x86-interrupt" fn page_fault_handler(
+    stack_frame: &mut InterruptStackFrame,
+    _error_code: PageFaultErrorCode) {
+    use x86_64::registers::control::Cr2;
+
+    println!("EXCEPTION: PAGE FAULT");
+    println!("Accessed Address: {:?}", Cr2::read());
+    println!("{:#?}", stack_frame);
+
+    hlt_loop();
+}
+
+
 
 #[derive(Debug, Clone, Copy)]
 #[repr(u8)] // The enum is a C-like enum so that we can directly specify the index for each variant
