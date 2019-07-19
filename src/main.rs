@@ -16,8 +16,11 @@ pub extern "C" fn _start() -> ! {
 
     blog_os::init();
 
-    let ptr = 0xdeadbeef as *mut u32;
-    unsafe { *ptr = 42; }
+    use x86_64::registers::control::Cr3;
+
+    let (level_4_page_table, _cr3_flags) = Cr3::read();
+    println!("Level 4 page table at: {:?}",
+             level_4_page_table.start_address());
 
     #[cfg(test)]
     test_main();
