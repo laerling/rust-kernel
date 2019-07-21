@@ -8,10 +8,13 @@
 
 use core::panic::PanicInfo;
 use blog_os::println;
+use bootloader::{entry_point, BootInfo};
 
+// set entry function (this macro typechecks the entrypoint functions argument(s))
+entry_point!(kernel_main);
 
-#[no_mangle] // don't mangle the name of this function
-pub extern "C" fn _start() -> ! {
+// we don't need to declare any extern "C" function anymore, due to the entry_point macro
+fn kernel_main(boot_info: &'static BootInfo) -> ! {
     println!("Hello World{}", "!");
 
     blog_os::init();
