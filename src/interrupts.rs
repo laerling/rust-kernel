@@ -69,7 +69,7 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(
     }
 
     let mut keyboard = KEYBOARD.lock();
-    let mut port = Port::new(0x60);
+    let port = Port::new(0x60);
 
     let scancode: u8 = unsafe { port.read() };
     if let Ok(Some(key_event)) = keyboard.add_byte(scancode) {
