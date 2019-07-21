@@ -16,14 +16,15 @@ entry_point!(kernel_main);
 // we don't need to declare any extern "C" function anymore, due to the entry_point macro
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
     println!("Hello World{}", "!");
-
     blog_os::init();
 
-    use x86_64::registers::control::Cr3;
-
-    let (level_4_page_table, _cr3_flags) = Cr3::read();
-    println!("Level 4 page table at: {:?}",
-             level_4_page_table.start_address());
+    let l4_table = unsafe { blog_os::memory::active_level_4_table(
+        boot_info.physical_memory_offset) };
+    for (i, entry) in l4_table.iter().enumerate() {
+        if !entry.is_unused() {
+            println!("L4 Entry {}: {:?}", i, entry);
+        }
+    }
 
     #[cfg(test)]
     test_main();
